@@ -43,14 +43,50 @@ public class SpellingBee {
     // TODO: generate all possible substrings and permutations of the letters.
     //  Store them all in the ArrayList words. Do this by calling ANOTHER method
     //  that will find the substrings recursively.
-    public void generate() {
-        // YOUR CODE HERE — Call your recursive method!
+    public void makeWords(String a, String b) {
+        if (b.isEmpty()) {
+            return;
+        }
+        for (int i = 0; i < b.length(); i++) {
+            String newB = b.substring(i) + b.substring(i, i + 1);
+            String newA = a + newB;
+            String newWord = newA + newB;
+            words.add(newWord);
+            makeWords(newA, newB);
+        }
     }
 
+    public void generate() {
+        // YOUR CODE HERE — Call your recursive method!\
+        makeWords("", letters);
+    }
+
+    public void sort() {
+        words = mergeSort(words, 0, words.size() - 1);
+    }
+
+    public ArrayList<String> merge(ArrayList<String> a, ArrayList<String> b) {
+        for (int i = 0; i < b.size(); i++) {
+            a.add(b.get(i));
+        }
+        return a;
+    }
     // TODO: Apply mergesort to sort all words. Do this by calling ANOTHER method
     //  that will find the substrings recursively.
-    public void sort() {
-        // YOUR CODE HERE
+    public ArrayList<String> mergeSort(ArrayList<String> word, int low, int high) {
+        // TODO: Fix base case
+        if (low == high) {
+            return word;
+        }
+
+
+
+        int med = (low + high) / 2;
+        ArrayList<String> half1 = mergeSort(word, med + 1, high);
+        ArrayList<String> half2 = mergeSort(word, low, med);
+
+        return merge(half1, half2);
+
     }
 
     // Removes duplicates from the sorted list.
@@ -65,10 +101,36 @@ public class SpellingBee {
         }
     }
 
+    public boolean find(String word, int low, int high) {
+        if (low == high && word.equals(words.get(high))) {
+            return true;
+        }
+        else if (low == high && !word.equals(words.get(high))) {
+            return false;
+        }
+        int mid = (low + high) / 2;
+        if (word.compareTo(words.get(mid)) > 0) {
+            low = mid + 1;
+            return find(word, mid, high);
+        }
+        else if (word.compareTo(words.get(mid)) < 0) {
+            high = mid - 1;
+            return find(word, low, mid);
+        }
+        else {
+            return false;
+        }
+    }
+
     // TODO: For each word in words, use binary search to see if it is in the dictionary.
     //  If it is not in the dictionary, remove it from words.
     public void checkWords() {
         // YOUR CODE HERE
+        for (String word : words) {
+            if (!find(word, 0, words.size())) {
+                words.remove(word);
+            }
+        }
     }
 
     // Prints all valid words to wordList.txt
